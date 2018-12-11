@@ -174,9 +174,9 @@ STRIP    := $(COMPILER_ROOT)strip
 OBJCOPY  := $(COMPILER_ROOT)objcopy
 
 # Sanity check: does 'gcc' actually exist?
-ifneq ($(shell if $(CC) --version &> /dev/null; then echo 1; fi),1)
-  $(warning $(CC) not found; try overriding COMPILER_ROOT \
-	    (see README.compiling))
+ifneq ($(shell if $(CC) --version > /dev/null 2>&1; then echo 1; fi),1)
+  $(warning $(CC) not found; try install both gcc and binutils for target platform; also try overriding COMPILER_ROOT \
+	    (see README.compiling) to fix the problem.)
 endif
 
 # Did platformVars add -lgcc to LDLIBS?  If so, we need to do the linking with
@@ -247,7 +247,7 @@ LIB_ARC  := $(LIBS:%=$(LIBDIR)/%.a)
 MAIN_OBJ := $(MAIN_SRC:%.c=%.o)
 
 # Data is relative to the compile directory
-DATA     := data
+DATA     ?= data
 
 DATA_SRC :=
 include $(DATA:%=%/Makerules)
@@ -306,11 +306,11 @@ objects: $(COMP_OBJ)
 
 %.o: %.c
 	@echo -e "\tCompiling" $@
-	$(CC) $(DEPFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) $(DEPFLAGS) $(CFLAGS) -g -o $@ $<
 
 %.o: %.S
 	@echo -e "\tAssembling" $@
-	$(CC) $(DEPFLAGS) $(ASFLAGS) -o $@ $<
+	$(CC) $(DEPFLAGS) $(ASFLAGS) $(ASCFLAGS) -g -o $@ $<
 
 clean:
 	@echo -e "\tCleaning all objects"
